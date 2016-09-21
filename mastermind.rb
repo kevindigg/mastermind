@@ -5,11 +5,14 @@ class Player
     def initialize(name)
         @name = name
     end
+
+    def guess
+    end
 end
 
 class Game
     MAX_GUESS = 12
-    attr_accessor :p1, :p2, :board, :p_guesser
+    attr_accessor :p1, :p2, :board, :player
 
     def initialize(p1="human", p2="computer")
         @guesses = 0
@@ -17,20 +20,22 @@ class Game
         @p2 = Computer.new(p2)
         @board = Board.new()
 
-        @p_guesser = get_player()
+        @player = get_player()
     end
 
     def play
-        puts "Hello, #{p_guesser.name}."
+        puts "Hello, #{player.name}."
         until @guesses == 12
             puts "The code is #{board.code}"
-            puts "You have #{MAX_GUESS-@guesses} guesses left."
+            puts "\nYou have #{MAX_GUESS-@guesses} guesses left."
             print "Enter your guess: "
-            input = gets.chomp.split("")[0..3].map { |digit| digit.to_i }
+            input = player.guess
             return "That's right. You win!" if input == board.code
 
             place,value = board.eval_guess(input)
             puts "\n================="
+            puts "Your guess: #{input}"
+            puts "================="      
             puts "You got #{place} in the right place and #{value} of the right value."
 
             @guesses += 1
@@ -63,7 +68,7 @@ class Board
 
     def initialize(code = nil)
 
-        @code = code ? code : Array.new(4) { |index| (rand(5)+1)}
+        @code = code ? code : Array.new(4) { |index| (rand(6)+1)}
     end
 
     def eval_guess(guess)   
@@ -89,9 +94,20 @@ class Board
 end
 
 class Human < Player
+    def initialize(name)
+        super(name)
+    end
+
+    def guess
+        gets.chomp.split("")[0..3].map { |digit| digit.to_i }
+    end
+
 end
 
 class Computer < Player
+    def initialize(name)
+        super(name)
+    end
 end
 
 g = Game.new()
